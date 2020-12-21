@@ -24,7 +24,9 @@ def main():
     print("hello")
     #testDict()
     #testPixelChange()
-    mostSimilar()
+    source = Image.open("Images\Image6.png")
+    #mostSimilar(source)
+    similarityPercentage(source)
 
 def testPixelChange():
     im2 = Image.open("Images\Image2.png")
@@ -39,8 +41,8 @@ def testPixelChange():
             
     im2.save("Output/im2.jpg", "JPEG")
 
-def mostSimilar():
-    source = Image.open("Images\Image6.png")
+def mostSimilar(source):
+
     source_pixels = source.load()
     dict = {}
     for k in range (7): #for each image in the folder
@@ -54,9 +56,28 @@ def mostSimilar():
                     abs(source_pixels[i,j][1] - img_pixels[i,j][1]) + \
                     abs(source_pixels[i,j][2] - img_pixels[i,j][2])
         dict[imgName] = totalDiff
+        #dict[imgName] = totalDiff / (source.size[0] * source.size[1])
     for key in dict:
         print(key + ": " + str(dict[key]))
     
+#research eigen values
+def similarityPercentage(source):
+    similarityPercentage = {}
+    for k in range (7): #for each image in the folder
+        imageName = "Image" + str(k) + ".png"
+        img = Image.open("Images\\" + imageName)
+        absDiff = ImageChops.difference(source, img)
+        absDiff_pixel = absDiff.load()
+        zeroCount = 0
+        
+        for i in range (absDiff.size[0]): # for each row in the image
+            for j in range(absDiff.size[1]): # for each col in the image
+                if(absDiff_pixel[i,j] == (0,0,0)):
+                    zeroCount = zeroCount + 1
+        similarityPercentage[imageName] = zeroCount * 100 / (absDiff.size[0] * absDiff.size[1])
+        
+    for key in similarityPercentage:
+        print(key + ": " + str(similarityPercentage[key]) + "%")
                 
 def testDict():
     dict = {"key" : 2, "sick" : 66}
