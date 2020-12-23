@@ -1,6 +1,5 @@
 
 import praw
-import datetime
 import urllib
 import requests
 
