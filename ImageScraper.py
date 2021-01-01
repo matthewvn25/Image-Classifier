@@ -14,13 +14,15 @@ reddit = praw.Reddit(client_id = '6oQuWT8j5mrj0g',
 image_urls = []
 #takes posts from subreddit and adds to list
 for post in reddit.subreddit("AnimeWallpaper").new(limit=10):
+    #only adds if the file is a png or jpg
+    #//todo: add more searches if post is not a picture
     if post.url[-4:] == '.png' or  post.url[-4:] == '.jpg':
         image_urls.append(post.url)
 
 
 
-print(image_urls)
-print(len(image_urls))
+#print(image_urls)
+#print(len(image_urls))
 
 
 #until UI this is how we will take user directory
