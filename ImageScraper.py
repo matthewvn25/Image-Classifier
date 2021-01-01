@@ -4,6 +4,7 @@ import praw
 import urllib
 import requests
 import os.path
+import time
 
 #Login infor to use Praw in reddit. Created and registered an app in reddit
 reddit = praw.Reddit(client_id = '6oQuWT8j5mrj0g',
@@ -13,17 +14,27 @@ reddit = praw.Reddit(client_id = '6oQuWT8j5mrj0g',
 image_urls = []
 #takes posts from subreddit and adds to list
 for post in reddit.subreddit("AnimeWallpaper").new(limit=10):
-    image_urls.append(post.url)
+    if post.url[-4:] == '.png' or  post.url[-4:] == '.jpg':
+        image_urls.append(post.url)
+
 
 
 print(image_urls)
-folder = 'Image/'
+print(len(image_urls))
+
+
+#until UI this is how we will take user directory
+#folder = input("Enter the folder to save")
+folder = 'Images/'
 #saves images to folder
 for x in range(len(image_urls)):
-    imageName = image_urls[x]
+    imageName = image_urls[x].replace('https://',''). \
+        replace('i.redd.it/','').replace('i.imgur.com/','').\
+            replace('imgur.com/a/','')
     response = requests.get(image_urls[x])
-    fullpath = os.path.join('Images/',str(imageName[-17:]))
+    fullpath = os.path.join(folder,imageName)
     file = open(fullpath, "wb")
     file.write(response.content)
-    file.close()
+
+file.close()
 
