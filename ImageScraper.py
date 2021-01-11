@@ -6,7 +6,36 @@ import requests
 import os.path
 import time
 
+###############################
+# -*- coding: utf-8 -*-
+from PIL import Image
+from PIL import ImageChops
+from numpy import asarray
 
+import sys
+
+#from scipy.misc import imread
+from scipy.linalg import norm
+from scipy import sum, average
+###############################
+
+#research eigen values
+def similarityPercentage(imageLocation):
+    source = Image.open("Source.png")
+    img = Image.open(imageLocation)
+    absDiff = ImageChops.difference(source, img)
+    absDiff_pixel = absDiff.load()
+    zeroCount = 0
+    
+    for i in range (absDiff.size[0]): # for each row in the image
+        for j in range(absDiff.size[1]): # for each col in the image
+            if(absDiff_pixel[i,j] == (0,0,0)):
+                zeroCount = zeroCount + 1
+    similarityPercentage[imageName] = zeroCount * 100 / (absDiff.size[0] * absDiff.size[1])
+
+    for key in similarityPercentage:
+        print(key + ": " + str(similarityPercentage[key]) + "%")
+    return similarityPercentage[key]
 
 
 if __name__ == "__main__":
@@ -15,36 +44,35 @@ if __name__ == "__main__":
                          client_secret = 'lwCsLOu6b9Doayj96CHyuCWJo0fVtg',
                          user_agent = 'GeminiScraper')
     
-    image_urls = []
-    #takes posts from subreddit and adds to list
-    for post in reddit.subreddit("AnimeWallpaper").new(limit=10):
-        #only adds if the file is a png or jpg
-        #//todo: add more searches if post is not a picture
+
+    folder = 'Waifu/'
+    #Generates a list of posts on the subreddit that can be navigated
+    #though one at a time
+ 
+    postsListGenerator = reddit.subreddit("AnimeWallpaper").new(limit=1)
+    for post in postsListGenerator:
+        #if the post is an image
         if post.url[-4:] == '.png' or  post.url[-4:] == '.jpg':
-            image_urls.append(post.url)
+            #download the image
+            response = requests.get(post.url)
+            #get the name of the image
+            imageName = post.url.replace('https://',''). \
+                replace('i.redd.it/','').replace('i.imgur.com/','').\
+                    replace('imgur.com/a/','')
+            #join the name and folder
+            fullpath = os.path.join(folder,imageName)
+            #open and save the image
+            file = open(fullpath, "wb")
+            file.write(response.content)
+            #check similarty
+            simPercent = similarityPercentage(fullpath)
+            #if match is less than number delete it
+            if simPercent < 0:
+                os.remove(fullpath)
+            else:
+                break
+            
     
-    
-    
-    #print(image_urls)
-    #print(len(image_urls))
-    
-    
-    #until UI this is how we will take user directory
-    #folder = input("Enter the Name of the folder to save images")
-    folder = 'Images/'
-    #saves images to folder
-    for x in range(len(image_urls)):
-        imageName = image_urls[x].replace('https://',''). \
-            replace('i.redd.it/','').replace('i.imgur.com/','').\
-                replace('imgur.com/a/','')
-        response = requests.get(image_urls[x])
-        fullpath = os.path.join(folder,imageName)
-        file = open(fullpath, "wb")
-        file.write(response.content)
-    file.close()
-        
-    for images in fullpath:
-        print(images)
     
   
 
