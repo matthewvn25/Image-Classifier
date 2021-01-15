@@ -21,21 +21,22 @@ from scipy import sum, average
 
 #research eigen values
 def similarityPercentage(imageLocation):
-    source = Image.open("Source.png")
-    img = Image.open(imageLocation)
-    absDiff = ImageChops.difference(source, img)
-    absDiff_pixel = absDiff.load()
-    zeroCount = 0
+    # source = Image.open("Source.png")
+    # img = Image.open(imageLocation)
+    # absDiff = ImageChops.difference(source, img)
+    # absDiff_pixel = absDiff.load()
+    # zeroCount = 0
     
-    for i in range (absDiff.size[0]): # for each row in the image
-        for j in range(absDiff.size[1]): # for each col in the image
-            if(absDiff_pixel[i,j] == (0,0,0)):
-                zeroCount = zeroCount + 1
-    similarityPercentage[imageName] = zeroCount * 100 / (absDiff.size[0] * absDiff.size[1])
+    # for i in range (absDiff.size[0]): # for each row in the image
+    #     for j in range(absDiff.size[1]): # for each col in the image
+    #         if(absDiff_pixel[i,j] == (0,0,0)):
+    #             zeroCount = zeroCount + 1
+    # similarityPercentage[imageName] = zeroCount * 100 / (absDiff.size[0] * absDiff.size[1])
 
-    for key in similarityPercentage:
-        print(key + ": " + str(similarityPercentage[key]) + "%")
-    return similarityPercentage[key]
+    # for key in similarityPercentage:
+    #     print(key + ": " + str(similarityPercentage[key]) + "%")
+    # return similarityPercentage[key]
+    return 1
 
 
 if __name__ == "__main__":
@@ -73,6 +74,3 @@ if __name__ == "__main__":
                 break
             
     
-    
-  
-
