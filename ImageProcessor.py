@@ -15,9 +15,10 @@ def main():
         #createCentroidsHelper()
         testImageNames = os.listdir("TestSet")
         for name in testImageNames:
-            print(name)
-            similarityPercentage(Image.open("TestSet/" + name))
-            print()
+            if(name != ".DS_Store"):
+                print(name)
+                similarityPercentage(Image.open("TestSet/" + name))
+                print()
     else:
         print("TestSet file does not exist. Ending program.")
     
