@@ -3,6 +3,12 @@ from PIL import Image
 from PIL import ImageChops
 from numpy import asarray
 
+import praw
+import urllib
+import requests
+import os.path
+import time
+
 import sys
 import os, numpy
 
@@ -11,18 +17,51 @@ from scipy.linalg import norm
 from scipy import sum, average
 
 def main():
+    
+    
+    # comment to file.write to pull images from reddit
+    # #Login infor to use Praw in reddit. Created and registered an app in reddit
+    # reddit = praw.Reddit(client_id = '6oQuWT8j5mrj0g',
+    #                       client_secret = 'lwCsLOu6b9Doayj96CHyuCWJo0fVtg',
+    #                       user_agent = 'GeminiScraper')
+    
+
+    # folder = 'TestSet/'
+    # #Generates a list of posts on the subreddit that can be navigated
+    # #though one at a time
+ 
+    # postsListGenerator = reddit.subreddit("AnimeWallpaper").new(limit=10)
+    # for post in postsListGenerator:
+    #     #if the post is an image
+    #     if post.url[-4:] == '.png' or  post.url[-4:] == '.jpg':
+    #         #download the image
+    #         response = requests.get(post.url)
+    #         #get the name of the image
+    #         imageName = post.url.replace('https://',''). \
+    #             replace('i.redd.it/','').replace('i.imgur.com/','').\
+    #                 replace('imgur.com/a/','')
+    #         #join the name and folder
+    #         fullpath = os.path.join(folder,imageName)
+    #         #open and save the image
+    #         file = open(fullpath, "wb")
+    #         file.write(response.content)
+
+    
     if os.path.exists("TestSet"): #more for the download
         #createCentroidsHelper()
         testImageNames = os.listdir("TestSet")
         for name in testImageNames:
             if(name != ".DS_Store"):
                 print(name)
-                similarityPercentage(Image.open("TestSet/" + name))
+                similarityPercentage(name,Image.open("TestSet/" + name))
                 print()
     else:
         print("TestSet file does not exist. Ending program.")
+        
+
+        
     
-def similarityPercentage(source):
+def similarityPercentage(sourceName,source):
     """Prints the similarity percentages between source image and centroids
     The source image and centroids are transformed into the same resolution.
     The absolute difference between the source image and each centroid is taken.
@@ -58,8 +97,41 @@ def similarityPercentage(source):
                      
         dict[names[k]] = round(similarPixelCount / (smallestRes[0] * smallestRes[1]) * 100, 3) 
         
+    #create variables for best images from dict
+    highest = 0
+    highestKey = ""
+    #save the highest percent and key
     for key in dict:
         print("\t" + key + ": " + str(dict[key]) + "%")
+        if dict[key] > highest:
+            highest = dict[key]
+            highestKey = key
+    #replace the name so that it can match the folder
+    highestKey = highestKey.replace('centroid_',''). \
+        replace('.png','')
+    print(highest)
+    print(highestKey)
+    print(sourceName)
+    print(os.listdir("LearningSets"))
+    
+    #try catchest for make directory errors
+    #NEEDS to be moved somewhere else
+    try:
+        os.mkdir("Waifus/")
+    except OSError as error: 
+        print('error')
+    for folderNames in os.listdir("LearningSets"):
+        try:
+            os.mkdir("Waifus/"+folderNames)
+        except OSError as error: 
+            print('error')
+    #Takes the image from the test set ande moves to the proper folder
+    #can use os.rename instead
+    #Currently moves all images to highest percent but does not give overall highest
+    os.replace("TestSet/"+sourceName, "Waifus/"+highestKey+"/"+sourceName)
+
+    
+        
         
 def findSmallestResolution(imageList):
     """Returns the smallest resolution from a List of Image Objects.
