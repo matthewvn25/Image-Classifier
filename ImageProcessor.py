@@ -3,6 +3,7 @@ from PIL import Image
 from PIL import ImageChops
 from numpy import asarray
 
+#"pip install praw" in console to install praw
 import praw
 import urllib
 import requests
@@ -17,49 +18,59 @@ from scipy.linalg import norm
 from scipy import sum, average
 
 def main():
-    
-    
-    # comment to file.write to pull images from reddit
-    # #Login infor to use Praw in reddit. Created and registered an app in reddit
-    # reddit = praw.Reddit(client_id = '6oQuWT8j5mrj0g',
-    #                       client_secret = 'lwCsLOu6b9Doayj96CHyuCWJo0fVtg',
-    #                       user_agent = 'GeminiScraper')
-    
-
-    # folder = 'TestSet/'
-    # #Generates a list of posts on the subreddit that can be navigated
-    # #though one at a time
- 
-    # postsListGenerator = reddit.subreddit("AnimeWallpaper").new(limit=10)
-    # for post in postsListGenerator:
-    #     #if the post is an image
-    #     if post.url[-4:] == '.png' or  post.url[-4:] == '.jpg':
-    #         #download the image
-    #         response = requests.get(post.url)
-    #         #get the name of the image
-    #         imageName = post.url.replace('https://',''). \
-    #             replace('i.redd.it/','').replace('i.imgur.com/','').\
-    #                 replace('imgur.com/a/','')
-    #         #join the name and folder
-    #         fullpath = os.path.join(folder,imageName)
-    #         #open and save the image
-    #         file = open(fullpath, "wb")
-    #         file.write(response.content)
-
+    # uncomment if you want to scrape
+    #webScrape(10)
     
     if os.path.exists("TestSet"): #more for the download
         #createCentroidsHelper()
         testImageNames = os.listdir("TestSet")
         for name in testImageNames:
             if(name != ".DS_Store"):
-                print(name)
+                #print(name)
                 similarityPercentage(name,Image.open("TestSet/" + name))
                 print()
     else:
         print("TestSet file does not exist. Ending program.")
         
 
-        
+def webScrape(n):
+    """Web scrapes the subreddit "AnimeWallpaper" for n images.
+    
+    :param n : the number of images the web scraper will keep.
+    """
+    #Login infor to use Praw in reddit. Created and registered an app in reddit
+    reddit = praw.Reddit(client_id = '6oQuWT8j5mrj0g',
+                         client_secret = 'lwCsLOu6b9Doayj96CHyuCWJo0fVtg',
+                         user_agent = 'GeminiScraper')
+    
+    folder = 'TestSet/'
+    #Generates a list of posts on the subreddit that can be navigated
+    #though one at a time
+ 
+    postsListGenerator = reddit.subreddit("AnimeWallpaper").new(limit=n)
+    for post in postsListGenerator:
+        #if the post is an image
+        if post.url[-4:] == '.png' or  post.url[-4:] == '.jpg':
+            #download the image
+            response = requests.get(post.url)
+            #get the name of the image
+            imageName = post.url.replace('https://',''). \
+                replace('i.redd.it/','').replace('i.imgur.com/','').\
+                    replace('imgur.com/a/','')
+            #join the name and folder
+            fullpath = os.path.join(folder,imageName)
+            #open and save the image
+            file = open(fullpath, "wb")
+            file.write(response.content)
+            #check similarty
+# =============================================================================
+#             simPercent = similarityPercentage(fullpath)
+#             #if match is less than number delete it
+#             if simPercent < 0:
+#                 os.remove(fullpath)
+#             else:
+#                 break
+# =============================================================================
     
 def similarityPercentage(sourceName,source):
     """Prints the similarity percentages between source image and centroids
@@ -77,7 +88,7 @@ def similarityPercentage(sourceName,source):
         centroids.append(Image.open("Centroids/" + name))
         
     for k in range (len(centroids)):
-        smallestRes = findSmallestResolution(source, centroids[k])
+        smallestRes = findSmallerResolution(source, centroids[k])
         source = source.resize(smallestRes, Image.ANTIALIAS)
         centroids[k] = centroids[k].resize(smallestRes, Image.ANTIALIAS)
         
@@ -101,6 +112,7 @@ def similarityPercentage(sourceName,source):
     highest = 0
     highestKey = ""
     #save the highest percent and key
+    print(sourceName)
     for key in dict:
         print("\t" + key + ": " + str(dict[key]) + "%")
         if dict[key] > highest:
@@ -109,29 +121,23 @@ def similarityPercentage(sourceName,source):
     #replace the name so that it can match the folder
     highestKey = highestKey.replace('centroid_',''). \
         replace('.png','')
-    print(highest)
-    print(highestKey)
-    print(sourceName)
-    print(os.listdir("LearningSets"))
+        
+    #print(highest)
+    #print(highestKey)
     
-    #try catchest for make directory errors
-    #NEEDS to be moved somewhere else
-    try:
-        os.mkdir("Waifus/")
-    except OSError as error: 
-        print('error')
+
+    #creates directory for each centroid if it does not exist
     for folderNames in os.listdir("LearningSets"):
-        try:
-            os.mkdir("Waifus/"+folderNames)
-        except OSError as error: 
-            print('error')
+        if(not(os.path.exists("Waifus/"+folderNames))):
+            try:
+                os.mkdir("Waifus/"+folderNames)
+            except OSError as error: 
+                print('OSError')
+                
     #Takes the image from the test set ande moves to the proper folder
     #can use os.rename instead
     #Currently moves all images to highest percent but does not give overall highest
-    os.replace("TestSet/"+sourceName, "Waifus/"+highestKey+"/"+sourceName)
-
-    
-        
+    os.replace("TestSet/"+sourceName, "Waifus/"+highestKey+"/"+sourceName)   
         
 def findSmallestResolution(imageList):
     """Returns the smallest resolution from a List of Image Objects.
@@ -151,7 +157,7 @@ def findSmallestResolution(imageList):
                 smallestRes = imageList[i].size
         return smallestRes
     
-def findSmallestResolution(img1, img2):
+def findSmallerResolution(img1, img2):
     """Returns the smallest resolution of 2 Image Objects
     Each resolution is calculated by multiplying the Image Object's length and width
     
