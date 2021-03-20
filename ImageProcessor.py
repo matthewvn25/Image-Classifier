@@ -39,6 +39,10 @@ def webScrape(n):
     :param n : the number of images the web scraper will keep.
     """
     print("Beginning Web Scrape for " + str(n) + " images. Omachi kudasai.")
+    
+    if(not(os.path.exists("TestSet"))):
+        os.mkdir("TestSet")
+        
     #Login infor to use Praw in reddit. Created and registered an app in reddit
     reddit = praw.Reddit(client_id = '6oQuWT8j5mrj0g',
                          client_secret = 'lwCsLOu6b9Doayj96CHyuCWJo0fVtg',
@@ -90,6 +94,9 @@ def similarityPercentage(sourceName,source):
         
     #https://pillow.readthedocs.io/en/5.1.x/handbook/image-file-formats.html
     
+    if(not(os.path.exists("Waifus"))):
+        os.mkdir("Waifus")
+        
     for k in range (len(centroids)):
         smallestRes = findSmallerResolution(source, centroids[k])
         source = source.resize(smallestRes, Image.ANTIALIAS)
@@ -119,7 +126,10 @@ def similarityPercentage(sourceName,source):
                     os.mkdir("Waifus/ValueError")
                 except OSError as error: 
                     print('OSError')
-            os.replace("TestSet/"+sourceName, "Waifus/ValueError/"+sourceName) 
+                try:
+                    os.replace("TestSet/"+sourceName, "Waifus/ValueError/"+sourceName) 
+                except FileNotFoundError as fne:
+                    print(sourceName + " not found.")
             return #no need to get highest key if image is ValueError
         
         
@@ -140,7 +150,6 @@ def similarityPercentage(sourceName,source):
     #print(highest)
     #print(highestKey)
     
-
     #creates directory for each centroid if it does not exist
     for folderNames in os.listdir("LearningSets"):
         if(not(os.path.exists("Waifus/"+folderNames))):
@@ -149,7 +158,7 @@ def similarityPercentage(sourceName,source):
             except OSError as error: 
                 print('OSError')
                 
-    #Takes the image from the test set ande moves to the proper folder
+    #Takes the image from the test set and moves to the proper folder
     #can use os.rename instead
     #Currently moves all images to highest percent but does not give overall highest
     
