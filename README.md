@@ -8,7 +8,9 @@ How to use:
   6. After all images are downloaded, a folder named "Waifus" will be created with subfolders for each category from the LearningSet. Each image will be compared to each centroid to classify the image. Images are compared pixel by pixel and must be within a pixel absolute distance of 100 units. I chose 100 as a arbitary alue and can be adjusted later on.
   7. There are definitely some bugs that need to be addressed. During the classification phase of the project, some images cannot be compared with the centroids and cause a "ValueError" and some images cause a "FileNotFoundError" even when the image is clearly in its correct directory (I think). So, there are try/except statements to make sure the project does not crash.
 
-There is a GUI currently in development so that is why you see a GUI project. It does not work yet.
-The image classification here is mediocre at best. I did some reading and because images are essentially a 2D matrix, we can maybe use some matrix math eventually like the Norm or something.
-ImageScraper.py is no longer needed but is kept for reference.
+Side notes:
+  1. There is a GUI currently in development so that is why you see a GUI project. It does not work yet.
+  2. The image classification here is mediocre at best. I did some reading and because images are essentially a 2D matrix, we can maybe use some matrix math eventually like the Norm or something.
+  3. ImageScraper.py is no longer needed but is kept for reference.
+  4. 
 Thank you for reading.
