@@ -12,5 +12,5 @@ Side notes:
   1. There is a GUI currently in development so that is why you see a GUI project. It does not work yet.
   2. The image classification here is mediocre at best. I did some reading and because images are essentially a 2D matrix, we can maybe use some matrix math eventually like the Norm or something.
   3. ImageScraper.py is no longer needed but is kept for reference.
-  4. 
+  
 Thank you for reading.
